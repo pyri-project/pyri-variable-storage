@@ -1,0 +1,86 @@
+service tech.pyri.variable_storage
+
+stdver 0.10
+
+import com.robotraconteur.datetime
+
+using com.robotraconteur.datetime.DateTimeUTC
+
+enum VariablePersistence
+    temporary = 0,
+    normal = 1,
+    persistent = 2,
+    const = 3
+end
+
+enum VariableProtectionLevel
+    private = 0,
+    read_only = 1,
+    read_write = 2
+end
+
+exception VariableNotFound
+
+struct VariableInfo
+    field string name
+    field string device
+    field string datatype
+    field VariablePersistence persistence
+    field VariableProtectionLevel default_protection
+    field DateTimeUTC created_on
+    field DateTimeUTC updated_on
+    field string{list} tags
+    field string{string} attributes
+    field VariableUserPermission{list} user_permissions
+    field VariableGroupPermission{list} group_permissions
+    field varvalue{string} extended
+end
+
+struct VariableUserPermission
+    field string username
+    field VariableProtectionLevel permission
+end
+
+struct VariableGroupPermission
+    field string groupname
+    field VariableProtectionLevel permission
+end
+
+object VariableStorage
+    function string{list} getf_device_names()        
+    function string{list} getf_variable_names(string device)
+    function VariableInfo getf_variable_info(string device, string name)
+
+    function void reset_variables()
+    function void reset_variables_to_defaults()
+
+    function void add_variable(string device, string name, string datatype, varvalue value, string{list} tags)
+    function void add_variable2(string device, string name, string datatype, varvalue value, string{list} tags, \
+        string{string} attributes, VariablePersistence persistence, varvalue reset_value, \
+        VariableProtectionLevel default_protection, varvalue{list} permissions, bool overwrite)
+    function varvalue getf_variable_value(string device, string name)
+    function void setf_variable_value(string device, string name, varvalue value)
+    function varvalue getf_variable_reset_value(string device, string name)
+    function void setf_variable_reset_value(string device, string name, varvalue value)
+    function void delete_variable(string device, string name)
+
+    function void delete_device(string device)
+
+    function string{list} filter_variables(string device, string name_regex, string{list} tags)
+
+    function string{list} getf_variable_tags(string device, string name)
+    function void add_variable_tags(string device, string name, string{list} tags)
+    function void remove_variable_tags(string device, string name, string{list} tags)
+    function void clear_variable_tags(string device, string name)
+    function string{list} list_all_tags()
+
+    function string{string} getf_variable_attributes(string device, string name)
+    function void add_variable_attribute(string device, string name, string attribute_name, string attribute_value)
+    function void remove_variable_attribute(string device, string name, string attribute_name)
+    function void clear_variable_attributes(string device, string name)
+
+    function varvalue{list} getf_variable_permissions(string device, string name)
+    function void add_variable_permission(string device, string name, varvalue permission)
+    function void remove_variable_permission(string device, string name, varvalue permission)
+    function void clear_variable_permissions(string device, string name)
+end
