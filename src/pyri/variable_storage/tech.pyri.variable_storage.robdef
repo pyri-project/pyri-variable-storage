@@ -3,8 +3,11 @@ service tech.pyri.variable_storage
 stdver 0.10
 
 import com.robotraconteur.datetime
+import com.robotraconteur.device
 
 using com.robotraconteur.datetime.DateTimeUTC
+using com.robotraconteur.device.Device
+using com.robotraconteur.device.DeviceInfo
 
 enum VariablePersistence
     temporary = 0,
@@ -47,6 +50,11 @@ struct VariableGroupPermission
 end
 
 object VariableStorage
+
+    implements Device
+
+    property DeviceInfo device_info [readonly,nolock]
+
     function string{list} getf_device_names()        
     function string{list} getf_variable_names(string device)
     function VariableInfo getf_variable_info(string device, string name)

@@ -1,0 +1,19 @@
+device:
+  name: pyri_variable_storage
+manufacturer:
+  name: PyRI_Project
+  uuid: 244389f3-35d5-4f9f-a244-c89649ce2a18
+model:
+  name: pyri_variable_storage
+  uuid: 3dfa7846-c147-43c6-b558-219df6981394
+user_description: Variable storage database for PyRI applications
+serial_number: 1
+device_classes:
+  - class_identifier:
+      name: variable_storage_db
+      uuid: abcc5fcb-e21d-4377-970d-2946cbf6ca4f
+    subclasses:
+      - sql_database
+implemented_types:
+  - com.robotraconteur.device.Device
+  - tech.pyri.variable_storage.VariableStorage

@@ -4,6 +4,8 @@ from pyri.plugins import robdef as robdef_plugins
 from pyri.variable_storage.storage import VariableStorageDB
 
 import pytest
+import os
+import tempfile
 
 def test_storage_object_basic():
     node = RR.RobotRaconteurNode()
@@ -17,34 +19,42 @@ def test_storage_object_basic():
     _run_test_on_db(node,None,db)
 
 def test_storage_object_rr():
-    node = RR.RobotRaconteurNode.s
-    
-    #node._SetNodeName("test_variable_db")
-    #node.Init()
-    #node.SetLogLevelFromString("TRACE")
 
-    RRC.RegisterStdRobDefServiceTypes(node)
-    robdef_plugins.register_all_plugin_robdefs(node)
+    with tempfile.TemporaryDirectory() as tmpdirname:
+        tmpdbfile = os.path.join(tmpdirname, "tempdb.db")
 
-    
+        node = RR.RobotRaconteurNode()
+        
+        node.SetNodeName("test_variable_db")
+        node.Init()
+        node.SetLogLevelFromString("INFO")
 
-    node_transport = RR.LocalTransport()
-    node.RegisterTransport(node_transport)
-    node_transport.StartServerAsNodeName("test_variable_db")
-    db = VariableStorageDB('sqlite:///C:/Users/user/Documents/pyri/software/testdb.db?check_same_thread=False', node = node)
-    node.RegisterService("db","tech.pyri.variable_storage.VariableStorage",db)
+        RRC.RegisterStdRobDefServiceTypes(node)
+        robdef_plugins.register_all_plugin_robdefs(node)
 
-    #client_node = RR.RobotRaconteurNode()
-    #client_node.Init()
-    #client_node.SetLogLevelFromString("TRACE")
+        
 
-    #client_node_transport = RR.LocalTransport()
-    #client_node.RegisterTransport(client_node_transport)
-    
-    client_db = node.ConnectService('rr+local:///?nodename=test_variable_db&service=db')
+        node_transport = RR.IntraTransport(node)
+        node.RegisterTransport(node_transport)
+        node_transport.StartServer()
+        db = VariableStorageDB(f'sqlite:///{tmpdbfile}?check_same_thread=False', node = node)    
+        node.RegisterService("db","tech.pyri.variable_storage.VariableStorage",db)
+
+        client_node = RR.RobotRaconteurNode()
+        client_node.Init()
+        client_node.SetLogLevelFromString("INFO")
+
+        client_node_transport = RR.IntraTransport(client_node)
+        client_node.RegisterTransport(client_node_transport)
+        
+        client_db = client_node.ConnectService('rr+intra:///?nodename=test_variable_db&service=db')
 
 
-    _run_test_on_db(node,client_db,client_db)
+        _run_test_on_db(node,client_db,client_db)
+
+        node.Shutdown()
+        client_node.Shutdown()
+        db.close()
 
 def _run_test_on_db(node,obj,db : VariableStorageDB):
 

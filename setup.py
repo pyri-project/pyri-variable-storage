@@ -20,7 +20,7 @@ setup(
         'test': ['pytest','pytest-asyncio']
     },
     entry_points = {
-        'pyri.plugins.factory': ['pyri-variable-storage-plugin=pyri.variable_storage.factory:get_factory'],
-        'pyri.plugins.robdef': ['pyri-variable-storage-robdef=pyri.variable_storage.robdef:get_variable_storage_robdef']
+        'pyri.plugins.robdef': ['pyri-variable-storage-robdef=pyri.variable_storage.robdef:get_robdef_factory'],
+        'console_scripts': ['pyri-variable-storage-service = pyri.variable_storage.__main__:main']
     }
 )

@@ -10,12 +10,13 @@ import threading
 
 
 class VariableStorageDB(object):
-    def __init__(self, connect_string : str = 'sqlite:///:memory:', node : RR.RobotRaconteurNode = None):
+    def __init__(self, connect_string : str = 'sqlite:///:memory:', device_info = None, node : RR.RobotRaconteurNode = None):
         self._lock = threading.Lock()
         if node is None:
             self._node = RR.RobotRaconteurNode.s
         else:
             self._node = node
+        self.device_info = device_info
         self._rr_user_permission = self._node.GetStructureType('tech.pyri.variable_storage.VariableUserPermission')
         self._rr_group_permission = self._node.GetStructureType('tech.pyri.variable_storage.VariableGroupPermission')
         self._variable_not_found = self._node.GetExceptionType('tech.pyri.variable_storage.VariableNotFound')
@@ -379,3 +380,8 @@ class VariableStorageDB(object):
 
     def clear_variable_permissions(self, device: str, name: str):
         raise RR.NotImplementedException("Permissions not implemented")
+
+    def close(self):
+        with self._lock:
+            if self._session is not None:
+                self._session.close()
