@@ -38,12 +38,16 @@ def main():
     else:
         db_url = args.db_url
 
-    db = VariableStorageDB(db_url, device_info=device_info, node = RRN)    
+    db = VariableStorageDB(db_url, device_info=device_info, node = RRN)
+
+    extra_imports = RRN.GetRegisteredServiceTypes()
 
     with RR.ServerNodeSetup("tech.pyri.variable_storage",59901,argv=rr_args):
 
         service_ctx = RRN.RegisterService("variable_storage","tech.pyri.variable_storage.VariableStorage",db)
         service_ctx.SetServiceAttributes(device_attributes)
+        for e in extra_imports:
+            service_ctx.AddExtraImport(e)
 
         if args.wait_signal:  
             #Wait for shutdown signal if running in service mode          

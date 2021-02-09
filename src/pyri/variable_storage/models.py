@@ -1,4 +1,4 @@
-from sqlalchemy import Table, Column, Integer, Numeric, String, PickleType, DateTime, ForeignKey
+from sqlalchemy import Table, Column, Integer, Numeric, String, LargeBinary, DateTime, ForeignKey
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import relationship, backref
 from enum import IntEnum
@@ -26,12 +26,12 @@ class Variable(Base):
     name = Column(String(512), index = True)
     device = Column(String(128))
     datatype = Column(String(128))
-    value = Column(PickleType())
-    reset_value = Column(PickleType(), default = None)
+    value = Column(LargeBinary())
+    reset_value = Column(LargeBinary(), default = None)
     persistence = Column(Integer(), default = VariablePersistence.TEMPORARY)
     default_protection = Column(Integer(), default = VariableProtectionLevel.READ_WRITE)
-    created_on = Column(PickleType()) # com.robotraconteur.datetime.TimeSpec2
-    updated_on = Column(PickleType()) # com.robotraconteur.datetime.TimeSpec2
+    created_on = Column(LargeBinary()) # com.robotraconteur.datetime.TimeSpec2
+    updated_on = Column(LargeBinary()) # com.robotraconteur.datetime.TimeSpec2
 
 class VariableTag(Base):
     __tablename__ = "pyri_variables_tags"

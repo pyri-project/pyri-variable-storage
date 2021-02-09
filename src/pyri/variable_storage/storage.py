@@ -8,6 +8,17 @@ import RobotRaconteur as RR
 from RobotRaconteurCompanion.Util import DateTimeUtil as rr_datetime_util
 import threading
 
+from RobotRaconteur.RobotRaconteurPython import MessageElementToBytes, MessageElementFromBytes
+from RobotRaconteur.RobotRaconteurPythonUtil import PackMessageElement, UnpackMessageElement
+
+
+def _rr_varvalue_to_bytes(val, node):
+    m = PackMessageElement(val, "varvalue", node=node)
+    return MessageElementToBytes(m)
+
+def _rr_varvalue_from_bytes(b, node):
+    m = MessageElementFromBytes(b)
+    return UnpackMessageElement(m, "varvalue", node=node)
 
 class VariableStorageDB(object):
     def __init__(self, connect_string : str = 'sqlite:///:memory:', device_info = None, node : RR.RobotRaconteurNode = None):
@@ -75,7 +86,7 @@ class VariableStorageDB(object):
                 var.name = name
                 var.device = device
                 var.datatype = datatype
-                var.value = value
+                var.value = _rr_varvalue_to_bytes(value, self._node)
                 if tags is not None:
                     for tag in tags:
                         model_tag = models.VariableTag()
@@ -116,7 +127,7 @@ class VariableStorageDB(object):
                 var.name = name
                 var.device = device
                 var.datatype = datatype
-                var.value = value
+                var.value = _rr_varvalue_to_bytes(value, self._node)
                 if tags is not None:
                     for tag in tags:
                         model_tag = models.VariableTag()
@@ -128,7 +139,7 @@ class VariableStorageDB(object):
                         model_attr.name, model_attr.value = attribute
                         var.attributes.append(model_attr)
                 var.persistence = persistence
-                var.reset_value = reset_value
+                var.reset_value = _rr_varvalue_to_bytes(reset_value,self._node)
                 var.default_protection = default_protection
                 if permissions is not None:
                     for p in permissions:
@@ -171,14 +182,14 @@ class VariableStorageDB(object):
         
         with self._lock:            
             var = self._query_variable(device,name)
-            return var.value
+            return _rr_varvalue_from_bytes(var.value,self._node)
 
     def setf_variable_value(self, device: str, name: str, value: Any) -> None:        
 
         ts_now = self._datetime_util.TimeSpec2Now() 
         var = self._query_variable(device,name)
         try:
-            var.value = value
+            var.value = _rr_varvalue_to_bytes(value, self._node)
             var.updated_on = ts_now
             self._session.commit()
         except:
@@ -189,14 +200,14 @@ class VariableStorageDB(object):
         
         with self._lock:            
             var = self._query_variable(device,name)
-            return var.reset_value
+            return _rr_varvalue_from_bytes(var.reset_value,self._node)
 
     def setf_variable_reset_value(self, device: str, name: str, value: Any) -> None:        
         with self._lock:
             ts_now = self._datetime_util.TimeSpec2Now() 
             var = self._query_variable(device,name)
             try:
-                var.reset_value = value
+                var.reset_value = _rr_varvalue_to_bytes(value,self._node)
                 var.updated_on = ts_now
                 self._session.commit()
             except:
