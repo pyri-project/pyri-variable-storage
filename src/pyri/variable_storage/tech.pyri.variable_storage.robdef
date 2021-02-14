@@ -65,7 +65,7 @@ object VariableStorage
     function void add_variable(string device, string name, string datatype, varvalue value, string{list} tags)
     function void add_variable2(string device, string name, string datatype, varvalue value, string{list} tags, \
         string{string} attributes, VariablePersistence persistence, varvalue reset_value, \
-        VariableProtectionLevel default_protection, varvalue{list} permissions, bool overwrite)
+        VariableProtectionLevel default_protection, varvalue{list} permissions, string doc, bool overwrite)
     function varvalue getf_variable_value(string device, string name)
     function void setf_variable_value(string device, string name, varvalue value)
     function varvalue getf_variable_reset_value(string device, string name)
@@ -91,4 +91,7 @@ object VariableStorage
     function void add_variable_permission(string device, string name, varvalue permission)
     function void remove_variable_permission(string device, string name, varvalue permission)
     function void clear_variable_permissions(string device, string name)
+
+    function string getf_variable_doc(string device, string name)
+    function void setf_variable_doc(string device, string name, string doc)
 end

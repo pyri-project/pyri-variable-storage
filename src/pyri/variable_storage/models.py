@@ -1,4 +1,4 @@
-from sqlalchemy import Table, Column, Integer, Numeric, String, LargeBinary, DateTime, ForeignKey
+from sqlalchemy import Table, Column, Integer, Numeric, String, LargeBinary, DateTime, ForeignKey, Text
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import relationship, backref
 from enum import IntEnum
@@ -30,6 +30,7 @@ class Variable(Base):
     reset_value = Column(LargeBinary(), default = None)
     persistence = Column(Integer(), default = VariablePersistence.TEMPORARY)
     default_protection = Column(Integer(), default = VariableProtectionLevel.READ_WRITE)
+    doc = Column(Text())
     created_on = Column(LargeBinary()) # com.robotraconteur.datetime.TimeSpec2
     updated_on = Column(LargeBinary()) # com.robotraconteur.datetime.TimeSpec2
 

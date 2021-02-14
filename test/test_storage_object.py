@@ -83,7 +83,7 @@ def _run_test_on_db(node,obj,db : VariableStorageDB):
 
     db.add_variable2("test_device1", "test_var2", "string", RR.VarValue("This is another test string","string"), ["tag3", "tag2"], \
         {"attr1": "some_value1", "attr2": "some_value2"}, variable_persistence["persistent"], RR.VarValue("This has been reset!","string"), \
-        variable_protection_level["read_write"], test_var2_perms, True)
+        variable_protection_level["read_write"], test_var2_perms, "This is a doc string", True)
 
     # Test filter_variables
 
@@ -169,6 +169,13 @@ def _run_test_on_db(node,obj,db : VariableStorageDB):
     db.clear_variable_attributes("test_device1", "test_var2")
     test_var1_attrs_4 = db.getf_variable_attributes("test_device1", "test_var2")
     assert len(test_var1_attrs_4) == 0
+
+    # Test doc
+    test_var2_doc1 = db.getf_variable_doc("test_device1", "test_var2")
+    assert test_var2_doc1 == "This is a doc string"
+    db.setf_variable_doc("test_device1", "test_var2", "This is a changed doc string")
+    test_var2_doc2 = db.getf_variable_doc("test_device1", "test_var2")
+    assert test_var2_doc2 == "This is a changed doc string"
 
     # Test delete_variable
     db.delete_variable("test_device1", "test_var1")

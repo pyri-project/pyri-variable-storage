@@ -108,7 +108,7 @@ class VariableStorageDB(object):
                 raise
 
     def add_variable2(self, device: str, name: str, datatype: str, value: Any, tags: List[str], attributes: Dict[str,str], \
-        persistence: int, reset_value: Any, default_protection: int, permissions: List[Any], overwrite: bool) -> None:
+        persistence: int, reset_value: Any, default_protection: int, permissions: List[Any], doc: str, overwrite: bool) -> None:
         
         assert name is not None and len(name) > 0
         assert device is not None and len(device) > 0
@@ -155,6 +155,7 @@ class VariableStorageDB(object):
                             var.group_permissions.append(model_group_permission)
                         else:
                             raise RR.InvalidArgumentException("permissions must be a list of VariableUserPermission or VariableGroupPermission")
+                var.doc = doc
                 var.created_on = ts_now
                 var.updated_on = ts_now
                 self._session.add(var)
@@ -391,6 +392,20 @@ class VariableStorageDB(object):
 
     def clear_variable_permissions(self, device: str, name: str):
         raise RR.NotImplementedException("Permissions not implemented")
+
+    def getf_variable_doc(self, device, name):
+        with self._lock:            
+            var = self._query_variable(device,name)
+            return var.doc
+
+    def setf_variable_doc(self, device, name, doc):
+        var = self._query_variable(device,name)
+        try:
+            var.doc = doc            
+            self._session.commit()
+        except:
+            self._session.rollback()
+            raise
 
     def close(self):
         with self._lock:
