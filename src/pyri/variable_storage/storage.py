@@ -64,10 +64,10 @@ class VariableStorageDB(object):
             res.datatype = var.datatype
             res.persistence = var.persistence
             res.default_protection = var.default_protection
-            res.created_on = var.created_on
-            res.updated_on = var.updated_on
+            res.created_on = _rr_varvalue_from_bytes(var.created_on,self._node).data
+            res.updated_on = _rr_varvalue_from_bytes(var.updated_on,self._node).data
             res.tags = [t.tag for t in var.tags]
-            res.attributes = {(a.name, a.value) for a in var.attributes}
+            res.attributes = {a.name: a.value for a in var.attributes}
             # TODO: permissions
 
         return res
@@ -78,7 +78,7 @@ class VariableStorageDB(object):
         assert name is not None and len(name) > 0
         assert device is not None and len(device) > 0
         
-        ts_now = self._datetime_util.TimeSpec2Now() 
+        ts_now = RR.VarValue(self._datetime_util.UtcNow(),"com.robotraconteur.datetime.DateTimeUTC")
 
         with self._lock:
             try:
@@ -92,8 +92,8 @@ class VariableStorageDB(object):
                         model_tag = models.VariableTag()
                         model_tag.tag = tag
                         var.tags.append(model_tag)
-                var.updated_on = ts_now   
-                var.created_on = ts_now
+                var.updated_on = _rr_varvalue_to_bytes(ts_now,self._node)
+                var.created_on = _rr_varvalue_to_bytes(ts_now,self._node)
                 self._session.add(var)
                 self._session.commit()
             except exc.IntegrityError as e:
@@ -115,7 +115,7 @@ class VariableStorageDB(object):
         assert persistence >=0 and persistence <=3
         assert default_protection >= 0 and default_protection <= 2
 
-        ts_now = self._datetime_util.TimeSpec2Now() 
+        ts_now = RR.VarValue(self._datetime_util.UtcNow(),"com.robotraconteur.datetime.DateTimeUTC")
 
         with self._lock:
             try:
@@ -156,8 +156,8 @@ class VariableStorageDB(object):
                         else:
                             raise RR.InvalidArgumentException("permissions must be a list of VariableUserPermission or VariableGroupPermission")
                 var.doc = doc
-                var.created_on = ts_now
-                var.updated_on = ts_now
+                var.created_on = _rr_varvalue_to_bytes(ts_now,self._node)
+                var.updated_on = _rr_varvalue_to_bytes(ts_now,self._node)
                 self._session.add(var)
                 self._session.commit()
             except exc.IntegrityError as e:
@@ -187,11 +187,11 @@ class VariableStorageDB(object):
 
     def setf_variable_value(self, device: str, name: str, value: Any) -> None:        
 
-        ts_now = self._datetime_util.TimeSpec2Now() 
+        ts_now = RR.VarValue(self._datetime_util.UtcNow(),"com.robotraconteur.datetime.DateTimeUTC")
         var = self._query_variable(device,name)
         try:
             var.value = _rr_varvalue_to_bytes(value, self._node)
-            var.updated_on = ts_now
+            var.updated_on = _rr_varvalue_to_bytes(ts_now,self._node)
             self._session.commit()
         except:
             self._session.rollback()
@@ -205,11 +205,11 @@ class VariableStorageDB(object):
 
     def setf_variable_reset_value(self, device: str, name: str, value: Any) -> None:        
         with self._lock:
-            ts_now = self._datetime_util.TimeSpec2Now() 
+            ts_now = RR.VarValue(self._datetime_util.UtcNow(),"com.robotraconteur.datetime.DateTimeUTC")
             var = self._query_variable(device,name)
             try:
                 var.reset_value = _rr_varvalue_to_bytes(value,self._node)
-                var.updated_on = ts_now
+                var.updated_on = _rr_varvalue_to_bytes(ts_now, self._node)
                 self._session.commit()
             except:
                 self._session.rollback()
