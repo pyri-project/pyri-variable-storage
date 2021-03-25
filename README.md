@@ -17,7 +17,7 @@ See https://github.com/pyri-project/pyri-core for more information on setting up
 The variable storage node does not require any other services to be running to start. The following is the default command to run the database using the SQLite database provider, storing all data in a single file:
 
 ```
-pyri-variable-storage-service --db-file=my_program.db --device-info-file=config/pyri_variable_storage_default_info.yml
+pyri-variable-storage-service --db-file=my_program.db --device-info-file=config/pyri_variable_storage_default_info.yml --robotraconteur-tcp-ipv4-discovery=true
 ```
 
 ## Variable Fields
