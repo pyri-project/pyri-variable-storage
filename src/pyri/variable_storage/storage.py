@@ -185,17 +185,18 @@ class VariableStorageDB(object):
             var = self._query_variable(device,name)
             return _rr_varvalue_from_bytes(var.value,self._node)
 
-    def setf_variable_value(self, device: str, name: str, value: Any) -> None:        
+    def setf_variable_value(self, device: str, name: str, value: Any) -> None:
+        with self._lock:       
 
-        ts_now = RR.VarValue(self._datetime_util.UtcNow(),"com.robotraconteur.datetime.DateTimeUTC")
-        var = self._query_variable(device,name)
-        try:
-            var.value = _rr_varvalue_to_bytes(value, self._node)
-            var.updated_on = _rr_varvalue_to_bytes(ts_now,self._node)
-            self._session.commit()
-        except:
-            self._session.rollback()
-            raise
+            ts_now = RR.VarValue(self._datetime_util.UtcNow(),"com.robotraconteur.datetime.DateTimeUTC")
+            var = self._query_variable(device,name)
+            try:
+                var.value = _rr_varvalue_to_bytes(value, self._node)
+                var.updated_on = _rr_varvalue_to_bytes(ts_now,self._node)
+                self._session.commit()
+            except:
+                self._session.rollback()
+                raise
 
     def getf_variable_reset_value(self, device: str, name: str) -> Any:
         
@@ -399,13 +400,14 @@ class VariableStorageDB(object):
             return var.doc
 
     def setf_variable_doc(self, device, name, doc):
-        var = self._query_variable(device,name)
-        try:
-            var.doc = doc            
-            self._session.commit()
-        except:
-            self._session.rollback()
-            raise
+        with self._lock:
+            var = self._query_variable(device,name)
+            try:
+                var.doc = doc            
+                self._session.commit()
+            except:
+                self._session.rollback()
+                raise
 
     def close(self):
         with self._lock:
