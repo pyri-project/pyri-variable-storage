@@ -7,6 +7,7 @@ import argparse
 from RobotRaconteurCompanion.Util.InfoFileLoader import InfoFileLoader
 from RobotRaconteurCompanion.Util.AttributesUtil import AttributesUtil
 from pyri.plugins import robdef as robdef_plugins
+from pyri.util.robotraconteur import add_default_ws_origins
 
 def main():
     parser = argparse.ArgumentParser(description="PyRI Variable Storage Service Node")
@@ -15,7 +16,7 @@ def main():
     parser_group.add_argument("--db-url", type=str,default=None,help="SQLAlchemy connections string (use --db-file for SQLite)")
     parser.add_argument("--device-info-file", type=argparse.FileType('r'),default=None,required=True,help="Device info file for variable storage service (required)")
     parser.add_argument("--wait-signal",action='store_const',const=True,default=False, help="wait for SIGTERM orSIGINT (Linux only)")
-    
+    parser.add_argument("--pyri-webui-server-port",type=int,default=8000,help="The PyRI WebUI port for websocket origin (default 8000)")
     
     args, _ = parser.parse_known_args()
 
@@ -42,7 +43,9 @@ def main():
 
     extra_imports = RRN.GetRegisteredServiceTypes()
 
-    with RR.ServerNodeSetup("tech.pyri.variable_storage",59901,argv=rr_args):
+    with RR.ServerNodeSetup("tech.pyri.variable_storage",59901,argv=rr_args) as node_setup:
+
+        add_default_ws_origins(node_setup.tcp_transport,args.pyri_webui_server_port)
 
         service_ctx = RRN.RegisterService("variable_storage","tech.pyri.variable_storage.VariableStorage",db)
         service_ctx.SetServiceAttributes(device_attributes)
