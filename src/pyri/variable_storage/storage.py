@@ -122,6 +122,7 @@ class VariableStorageDB(object):
 
                 if overwrite:
                     self._session.query(models.Variable).filter(models.Variable.name==name, models.Variable.device==device).delete()
+                    self._session.commit()
 
                 var = models.Variable()
                 var.name = name
