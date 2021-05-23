@@ -28,17 +28,18 @@ class VariableStorageDB(object):
         else:
             self._node = node
         self.device_info = device_info
-        self._rr_user_permission = self._node.GetStructureType('tech.pyri.variable_storage.VariableUserPermission')
-        self._rr_group_permission = self._node.GetStructureType('tech.pyri.variable_storage.VariableGroupPermission')
-        self._variable_not_found = self._node.GetExceptionType('tech.pyri.variable_storage.VariableNotFound')
-        self._variable_info = self._node.GetStructureType('tech.pyri.variable_storage.VariableInfo')
-
-        self._datetime_util = rr_datetime_util.DateTimeUtil(self._node)
-        
+                        
         self._engine = create_engine(connect_string)
         self._Session = sessionmaker(bind=self._engine)
         self._session : Session = self._Session()
         models.Base.metadata.create_all(self._engine)
+
+    def RRServiceObjectInit(self, ctx, service_path):
+        self._datetime_util = rr_datetime_util.DateTimeUtil(self._node)
+        self._rr_user_permission = self._node.GetStructureType('tech.pyri.variable_storage.VariableUserPermission')
+        self._rr_group_permission = self._node.GetStructureType('tech.pyri.variable_storage.VariableGroupPermission')
+        self._variable_not_found = self._node.GetExceptionType('tech.pyri.variable_storage.VariableNotFound')
+        self._variable_info = self._node.GetStructureType('tech.pyri.variable_storage.VariableInfo')
 
     #TODO: Don't read all columns when not needed
     def getf_device_names(self) -> List[str]:

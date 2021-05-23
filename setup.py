@@ -11,7 +11,7 @@ setup(
     packages=find_namespace_packages(where='src'),
     include_package_data=True,
     package_data = {
-        'pyri.variable_storage': ['*.robdef']
+        'pyri.variable_storage': ['*.robdef','*.yml']
     },
     zip_safe=False,
     install_requires=[
