@@ -24,6 +24,7 @@ setup(
     },
     entry_points = {
         'pyri.plugins.robdef': ['pyri-variable-storage-robdef=pyri.variable_storage.robdef:get_robdef_factory'],
-        'console_scripts': ['pyri-variable-storage-service = pyri.variable_storage.__main__:main']
+        'console_scripts': ['pyri-variable-storage-service = pyri.variable_storage.__main__:main'],
+        'pyri.plugins.service_node_launch': ['pyri-variable-storage-launch = pyri.variable_storage.service_node_launch:get_service_node_launch_factory']
     }
 )
