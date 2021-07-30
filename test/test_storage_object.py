@@ -15,6 +15,7 @@ def test_storage_object_basic():
     robdef_plugins.register_all_plugin_robdefs(node)
 
     db = VariableStorageDB('sqlite:///:memory:', node = node)
+    db.RRServiceObjectInit(None, "")
 
     _run_test_on_db(node,None,db)
 
